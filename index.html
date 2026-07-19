@@ -1,0 +1,62 @@
+<!-- ... existing code ... -->
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>不髒媽^^日本玩具電 - 假面騎士專賣屋</title>
+    
+    <!-- 1. Google Search Console 網站驗證碼 (有助於 SEO 排名與收錄) -->
+    <meta name="google-site-verification" content="YGQiArEZN0246er_HeBHIHk3HLAgwOPt98SIOpsBBnE" />
+
+    <!-- 2. Google Analytics 4 (GA4) 流量追蹤碼 -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-CRVE18LE76"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+
+        // 使用您的專屬 GA4 評估 ID
+        gtag('config', 'G-CRVE18LE76');
+    </script>
+
+    <style>
+        /* 基礎排版與色彩設定 */
+<!-- ... existing code ... -->
+    <!-- ==================== JavaScript 應用程式邏輯 ==================== -->
+    <script>
+        // 1. 頁面切換邏輯
+        function switchPage(pageId) {
+            // 隱藏所有頁面
+            document.querySelectorAll('.page-view').forEach(page => {
+                page.classList.remove('active');
+            });
+            // 移除導覽列的 active 狀態
+            document.querySelectorAll('nav a').forEach(nav => {
+                nav.classList.remove('active');
+            });
+            
+            // 顯示目標頁面
+            document.getElementById('page-' + pageId).classList.add('active');
+            
+            // 如果有對應的導覽列按鈕，加上 active 樣式
+            let navItem = document.getElementById('nav-' + pageId);
+            if(navItem) navItem.classList.add('active');
+
+            // 如果切換到收購頁，重新渲染一次清單
+            if(pageId === 'buy') {
+                renderProducts();
+            }
+
+            // [新增] 告訴 Google Analytics 使用者切換了分頁 (虛擬頁面追蹤)
+            if (typeof gtag === 'function') {
+                let pageTitle = pageId === 'home' ? '首頁' : (pageId === 'buy' ? '收購報價頁' : '後台管理');
+                gtag('event', 'page_view', {
+                    page_title: pageTitle,
+                    page_location: window.location.href + '?page=' + pageId
+                });
+            }
+        }
+
+        // 2. 預設測試數據
+<!-- ... existing code ... -->
