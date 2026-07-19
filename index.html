@@ -114,31 +114,38 @@
         .map-btn { display: inline-block; background: #333; color: white; padding: 12px 24px; border-radius: 30px; text-decoration: none; font-weight: bold; margin-top: 15px; transition: background 0.3s; }
         .map-btn:hover { background: #555; }
 
-        /* 搜尋與商品列表 (收購頁面用) */
-        .search-box { display: flex; gap: 10px; margin-bottom: 20px; }
-        .search-box input { flex: 1; padding: 15px; font-size: 1.1em; border: 2px solid #ddd; border-radius: 8px; }
-        .search-box button { padding: 15px 25px; background: #e60012; color: white; border: none; border-radius: 8px; font-size: 1.1em; cursor: pointer; }
+        /* 搜尋與分類區塊 */
+        .search-box { display: flex; gap: 10px; margin-bottom: 15px; }
+        .search-box input { flex: 1; padding: 15px; font-size: 1.1em; border: 2px solid #ddd; border-radius: 8px; outline: none; transition: border 0.3s; }
+        .search-box input:focus { border-color: #e60012; }
         
+        .category-filters { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 25px; padding-bottom: 15px; border-bottom: 1px dashed #ddd; }
+        .category-btn { background: #fff; color: #666; border: 1px solid #ccc; padding: 8px 18px; border-radius: 25px; cursor: pointer; font-weight: bold; font-size: 0.9em; transition: all 0.3s; }
+        .category-btn:hover { background: #f0f0f0; }
+        .category-btn.active { background: #e60012; color: #fff; border-color: #e60012; box-shadow: 0 2px 6px rgba(230,0,18,0.3); }
+        
+        /* 商品列表 (收購頁面用) */
         .product-list { display: flex; flex-direction: column; gap: 15px; }
-        .product-item { display: flex; justify-content: space-between; align-items: center; border: 1px solid #eee; padding: 20px; border-radius: 8px; background: #fafafa; flex-wrap: wrap;}
+        .product-item { display: flex; justify-content: space-between; align-items: center; border: 1px solid #eee; padding: 20px; border-radius: 8px; background: #fafafa; flex-wrap: wrap; transition: box-shadow 0.3s; }
+        .product-item:hover { box-shadow: 0 4px 12px rgba(0,0,0,0.08); border-color: #ddd; }
         .product-info h3 { margin: 0 0 5px 0; color: #333; }
         .product-info p { margin: 0; color: #666; font-size: 0.9em; }
+        .tag-series { display: inline-block; background: #333; color: white; padding: 3px 8px; border-radius: 4px; font-size: 0.8em; margin-bottom: 8px; }
+        
         .price-box { text-align: right; }
         .price-sell { color: #e60012; font-weight: bold; font-size: 1.2em; }
         .price-buy { color: #009900; font-weight: bold; margin-top: 5px;}
-        .line-btn { display: inline-block; background: #00c300; color: #fff; padding: 8px 15px; text-decoration: none; border-radius: 5px; margin-top: 10px; font-weight: bold; }
+        .line-btn { display: inline-block; background: #00c300; color: #fff; padding: 8px 15px; text-decoration: none; border-radius: 5px; margin-top: 10px; font-weight: bold; transition: opacity 0.3s;}
+        .line-btn:hover { opacity: 0.9; }
         
         /* 後台管理區塊 */
         .admin-panel { background: #fff3f3; padding: 20px; border-radius: 8px; border: 2px dashed #e60012; }
-        .admin-form { display: grid; gap: 10px; margin-bottom: 20px; }
-        .admin-form input { padding: 10px; border: 1px solid #ccc; border-radius: 4px; }
-        .admin-form button { background: #333; color: white; padding: 10px; border: none; cursor: pointer; font-weight: bold; border-radius: 4px; }
-        .delete-btn { background: #ff4444; color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer; }
 
         @media (max-width: 768px) {
             header { flex-direction: column; text-align: center; gap: 15px; }
             .product-item { flex-direction: column; align-items: flex-start; gap: 15px; }
             .price-box { text-align: left; }
+            .search-box { flex-direction: column; }
         }
     </style>
 </head>
@@ -226,12 +233,17 @@
     <div id="page-buy" class="page-view">
         <div class="container">
             <h2 class="section-title">💰 裝備收購查詢系統</h2>
-            <p>想出售您的裝備嗎？請在下方搜尋框輸入玩具名稱，即可查詢最新收購行情。</p>
-            <p style="color: #e60012; font-weight: bold;">※ 此價格依據「商品等級」而定，實際收購價請加 LINE 傳送照片由專人為您精準報價。</p>
+            <p>想出售您的裝備嗎？請選擇作品分類，或直接輸入關鍵字查詢最新收購行情。</p>
+            <p style="color: #e60012; font-weight: bold; margin-bottom: 20px;">※ 此價格依據「商品等級」而定，實際收購價請加 LINE 傳送照片由專人為您精準報價。</p>
             
+            <!-- 搜尋框 -->
             <div class="search-box">
-                <input type="text" id="searchInput" placeholder="輸入關鍵字... (例如: CSM 555)" onkeyup="filterProducts()">
-                <button onclick="filterProducts()">搜尋</button>
+                <input type="text" id="searchInput" placeholder="輸入關鍵字... (例如: CSM, Faiz, 變身腰帶)" onkeyup="filterProducts()">
+            </div>
+            
+            <!-- 動態分類按鈕區塊 -->
+            <div class="category-filters" id="categoryFilters">
+                <!-- 按鈕將由 JS 自動載入 -->
             </div>
 
             <div class="product-list" id="productList">
@@ -251,8 +263,7 @@
             <p>我們的資料庫已全面升級為 Google 雲端試算表。請點擊下方按鈕前往 Google 表格進行商品的新增、修改或刪除。</p>
             <p style="color:#e60012; font-weight:bold;">(在表格修改完成後，前台網頁會即時同步最新資料)</p>
             
-            <!-- 將後台的按鈕連到 Google 試算表首頁，方便隨時登入編輯 -->
-            <a href="https://docs.google.com/spreadsheets/u/0/" target="_blank" class="line-btn" style="background:#1e3c72; margin-bottom: 30px; font-size: 1.1em;">📝 前往 Google 表格編輯資料</a>
+            <a href="https://docs.google.com/spreadsheets/u/0/" target="_blank" class="line-btn" style="background:#1e3c72; margin-bottom: 30px; font-size: 1.1em; display: inline-block;">📝 前往 Google 表格編輯資料</a>
             
             <h3>目前前台抓取到的最新資料 (預覽)</h3>
             <div class="product-list" id="adminProductList">
@@ -271,6 +282,7 @@
         const googleSheetCSV = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSuua-yJ_puKBIgbGaRh7cMN1GchcD03eJD2owW_RgqpSLoh336ptQ5iFYWmLlW0-kSpkdD1yLsotr1/pub?output=csv"; 
         
         let globalProducts = []; // 將抓取到的資料存放在這裡
+        let currentCategory = '全部'; // 目前選擇的分類
 
         // 頁面切換控制
         function switchPage(pageId) {
@@ -294,19 +306,22 @@
                 const response = await fetch(googleSheetCSV);
                 const data = await response.text();
                 
-                // 解析 CSV 資料 (以換行和逗號分割)
-                const rows = data.split('\n').slice(1); // 略過第一行的標題列
+                // 解析 CSV 資料
+                const rows = data.split('\n').slice(1); 
                 globalProducts = rows.map(row => {
                     const cols = row.split(',').map(col => col.replace(/(^"|"$)/g, '').trim()); 
                     return {
                         name: cols[0] || '',
                         price: cols[1] || '需估價',
                         grade: cols[2] || '未標示',
-                        date: cols[3] || '近期'
+                        date: cols[3] || '近期',
+                        series: cols[4] || '未分類' // 新增抓取第 5 欄 (E欄) 作為作品分類
                     };
-                }).filter(p => p.name !== ''); // 過濾掉空白行
+                }).filter(p => p.name !== '');
 
-                renderProducts();
+                // 資料載入後，產生分類按鈕並渲染商品
+                renderCategories();
+                filterProducts();
                 
             } catch (error) {
                 console.error("無法讀取 Google 表格:", error);
@@ -314,18 +329,50 @@
             }
         }
 
-        // 渲染前台商品卡片
-        function renderProducts(filterText = "") {
+        // 自動生成作品分類按鈕
+        function renderCategories() {
+            const container = document.getElementById('categoryFilters');
+            container.innerHTML = '';
+            
+            // 抓出所有不重複的「作品名稱」，並過濾掉空值或未分類
+            let uniqueSeries = [...new Set(globalProducts.map(p => p.series))].filter(s => s !== '未分類' && s !== '');
+            let allCategories = ['全部', ...uniqueSeries];
+
+            allCategories.forEach(cat => {
+                let btn = document.createElement('button');
+                // 若為目前選中的分類，則加上 active 樣式
+                btn.className = 'category-btn' + (cat === currentCategory ? ' active' : '');
+                btn.innerText = cat;
+                btn.onclick = () => {
+                    currentCategory = cat;        // 更新目前選中的分類
+                    renderCategories();           // 重新整理按鈕外觀 (將紅底切換到點擊的按鈕上)
+                    filterProducts();             // 重新過濾商品清單
+                };
+                container.appendChild(btn);
+            });
+        }
+
+        // 搜尋過濾 (同時包含「作品分類」與「關鍵字」雙重過濾)
+        function filterProducts() {
+            const keyword = document.getElementById('searchInput').value.toLowerCase();
             const list = document.getElementById('productList');
             list.innerHTML = '';
             
             let displayProducts = globalProducts;
-            if (filterText) {
-                displayProducts = displayProducts.filter(p => p.name.toLowerCase().includes(filterText.toLowerCase()));
+
+            // 1. 先依據點選的「作品分類」進行過濾
+            if (currentCategory !== '全部') {
+                displayProducts = displayProducts.filter(p => p.series === currentCategory);
             }
 
+            // 2. 再依據上方輸入的「關鍵字」進行過濾
+            if (keyword) {
+                displayProducts = displayProducts.filter(p => p.name.toLowerCase().includes(keyword));
+            }
+
+            // 渲染結果
             if (displayProducts.length === 0) {
-                list.innerHTML = '<p style="text-align:center; padding: 20px;">找不到相關商品，請嘗試其他關鍵字，或直接加 LINE 詢問！</p>';
+                list.innerHTML = '<p style="text-align:center; padding: 20px; color:#666;">找不到符合條件的商品，請嘗試其他關鍵字，或直接加 LINE 詢問客服！</p>';
                 return;
             }
 
@@ -333,10 +380,11 @@
                 let html = `
                     <div class="product-item">
                         <div class="product-info">
+                            <span class="tag-series">${p.series}</span>
                             <h3 style="font-size: 1.2em;">${p.name}</h3>
                             <p style="margin-top:8px;">
                                 評估等級：<strong style="color:#e6683c; background:#fff0ed; padding:3px 8px; border-radius:4px;">${p.grade}</strong> | 
-                                報價更新日：${p.date}
+                                報價日：${p.date}
                             </p>
                         </div>
                         <div class="price-box">
@@ -347,12 +395,6 @@
                 `;
                 list.innerHTML += html;
             });
-        }
-
-        // 搜尋過濾
-        function filterProducts() {
-            const keyword = document.getElementById('searchInput').value;
-            renderProducts(keyword);
         }
 
         // 管理員登入驗證
@@ -372,9 +414,9 @@
             list.innerHTML = '';
             globalProducts.forEach(p => {
                 let html = `
-                    <div class="product-item" style="opacity: 0.8;">
+                    <div class="product-item" style="opacity: 0.8; flex-direction:row;">
                         <div>
-                            <strong>${p.name}</strong><br>
+                            <strong>[${p.series}] ${p.name}</strong><br>
                             <small>收購價: ${p.price} | 等級: ${p.grade} | 日期: ${p.date}</small>
                         </div>
                     </div>
