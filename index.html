@@ -14,7 +14,6 @@
       window.dataLayer = window.dataLayer || [];
       function gtag(){dataLayer.push(arguments);}
       gtag('js', new Date());
-
       gtag('config', 'G-CRVE18LE76');
     </script>
 
@@ -227,8 +226,8 @@
     <div id="page-buy" class="page-view">
         <div class="container">
             <h2 class="section-title">💰 裝備收購查詢系統</h2>
-            <p>想出售您的裝備嗎？請在下方搜尋框輸入玩具名稱（如：555、Build、CSM），即可查詢我們的「最高收購參考價」。</p>
-            <p style="color: #e60012; font-weight: bold;">※ 實際收購價將視盒況、缺件與功能正常與否而定，請加 LINE 傳送照片為準。</p>
+            <p>想出售您的裝備嗎？請在下方搜尋框輸入玩具名稱，即可查詢最新收購行情。</p>
+            <p style="color: #e60012; font-weight: bold;">※ 此價格依據「商品等級」而定，實際收購價請加 LINE 傳送照片由專人為您精準報價。</p>
             
             <div class="search-box">
                 <input type="text" id="searchInput" placeholder="輸入關鍵字... (例如: CSM 555)" onkeyup="filterProducts()">
@@ -236,7 +235,8 @@
             </div>
 
             <div class="product-list" id="productList">
-                <!-- 商品清單會由 JavaScript 自動產生在這裡 -->
+                <p style="text-align:center; padding: 20px;">載入即時報價中，請稍候...</p>
+                <!-- 商品清單會由 JavaScript 從 Google 表格自動產生在這裡 -->
             </div>
         </div>
     </div>
@@ -244,19 +244,17 @@
     <!-- ==================== 頁面 3：隱藏的管理員後台 ==================== -->
     <div id="page-admin" class="page-view">
         <div class="container admin-panel">
-            <h2 class="section-title">⚙️ 後台管理系統 (數據已儲存於您的瀏覽器)</h2>
+            <h2 class="section-title">⚙️ 後台管理系統 (Google 表格連動)</h2>
             <button onclick="switchPage('home')" style="margin-bottom: 20px; padding: 8px; background: #333; color:#fff; border:none; border-radius:4px;">🚪 登出並返回首頁</button>
             
-            <h3>新增商品 / 更新報價</h3>
-            <div class="admin-form">
-                <input type="text" id="pName" placeholder="商品名稱 (必填，例：CSM 假面騎士 555 腰帶)">
-                <input type="text" id="pDesc" placeholder="商品描述 (例：日版全新品，盒況優)">
-                <input type="text" id="pPrice" placeholder="商城售價 (例：8500)">
-                <input type="text" id="pBuyPrice" placeholder="最高收購參考價 (例：6000)">
-                <button onclick="addProduct()">➕ 確定上架</button>
-            </div>
-
-            <h3>目前資料庫清單</h3>
+            <h3>管理資料庫</h3>
+            <p>我們的資料庫已全面升級為 Google 雲端試算表。請點擊下方按鈕前往 Google 表格進行商品的新增、修改或刪除。</p>
+            <p style="color:#e60012; font-weight:bold;">(在表格修改完成後，前台網頁會即時同步最新資料)</p>
+            
+            <!-- 將後台的按鈕連到 Google 試算表首頁，方便隨時登入編輯 -->
+            <a href="https://docs.google.com/spreadsheets/u/0/" target="_blank" class="line-btn" style="background:#1e3c72; margin-bottom: 30px; font-size: 1.1em;">📝 前往 Google 表格編輯資料</a>
+            
+            <h3>目前前台抓取到的最新資料 (預覽)</h3>
             <div class="product-list" id="adminProductList">
                 <!-- 後台商品清單 -->
             </div>
@@ -269,88 +267,81 @@
 
     <!-- ==================== JavaScript 應用程式邏輯 ==================== -->
     <script>
-        // 1. 頁面切換邏輯 (並同時發送 GA4 虛擬頁面瀏覽紀錄)
+        // 設定專屬的 Google Sheet CSV 網址
+        const googleSheetCSV = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSuua-yJ_puKBIgbGaRh7cMN1GchcD03eJD2owW_RgqpSLoh336ptQ5iFYWmLlW0-kSpkdD1yLsotr1/pub?output=csv"; 
+        
+        let globalProducts = []; // 將抓取到的資料存放在這裡
+
+        // 頁面切換控制
         function switchPage(pageId) {
-            // 隱藏所有頁面
-            document.querySelectorAll('.page-view').forEach(page => {
-                page.classList.remove('active');
-            });
-            // 移除導覽列的 active 狀態
-            document.querySelectorAll('nav a').forEach(nav => {
-                nav.classList.remove('active');
-            });
+            document.querySelectorAll('.page-view').forEach(page => page.classList.remove('active'));
+            document.querySelectorAll('nav a').forEach(nav => nav.classList.remove('active'));
             
-            // 顯示目標頁面
             document.getElementById('page-' + pageId).classList.add('active');
-            
-            // 如果有對應的導覽列按鈕，加上 active 樣式
             let navItem = document.getElementById('nav-' + pageId);
             if(navItem) navItem.classList.add('active');
 
-            // 如果切換到收購頁，重新渲染一次清單
-            if(pageId === 'buy') {
-                renderProducts();
-            }
-
-            // 讓 Google Analytics 知道客人切換了頁面
+            // GA4 虛擬頁面切換追蹤
             if (typeof gtag === 'function') {
                 let pageTitle = pageId === 'home' ? '首頁' : (pageId === 'buy' ? '收購報價頁' : '後台管理');
-                gtag('event', 'page_view', {
-                    page_title: pageTitle,
-                    page_location: window.location.href.split('?')[0] + '?page=' + pageId
-                });
+                gtag('event', 'page_view', { page_title: pageTitle, page_location: window.location.href.split('?')[0] + '?page=' + pageId });
             }
         }
 
-        // 2. 預設測試數據
-        const defaultProducts = [
-            { id: 1, name: "CSM 假面騎士 555 Faiz 變身腰帶 ver.2", desc: "日版全新，語音聲光完美重現", price: "8,500", buyPrice: "6,000" },
-            { id: 2, name: "DX 假面騎士 Geats 慾望驅動器", desc: "附屬基本帶扣，新手入坑首選", price: "1,200", buyPrice: "500" },
-            { id: 3, name: "S.H.Figuarts 假面騎士 W 旋風王牌", desc: "真骨彫製法，關節緊實無掉漆", price: "2,500", buyPrice: "1,800" }
-        ];
+        // 非同步讀取 Google 試算表
+        async function fetchGoogleSheetData() {
+            try {
+                const response = await fetch(googleSheetCSV);
+                const data = await response.text();
+                
+                // 解析 CSV 資料 (以換行和逗號分割)
+                const rows = data.split('\n').slice(1); // 略過第一行的標題列
+                globalProducts = rows.map(row => {
+                    const cols = row.split(',').map(col => col.replace(/(^"|"$)/g, '').trim()); 
+                    return {
+                        name: cols[0] || '',
+                        price: cols[1] || '需估價',
+                        grade: cols[2] || '未標示',
+                        date: cols[3] || '近期'
+                    };
+                }).filter(p => p.name !== ''); // 過濾掉空白行
 
-        // 3. 讀取或初始化 LocalStorage
-        function loadProducts() {
-            let products = localStorage.getItem('buzangma_products');
-            if (!products) {
-                localStorage.setItem('buzangma_products', JSON.stringify(defaultProducts));
-                return defaultProducts;
+                renderProducts();
+                
+            } catch (error) {
+                console.error("無法讀取 Google 表格:", error);
+                document.getElementById('productList').innerHTML = '<p style="text-align:center; color:red;">資料載入失敗，請檢查網路或稍後再試。</p>';
             }
-            return JSON.parse(products);
         }
 
-        function saveProducts(products) {
-            localStorage.setItem('buzangma_products', JSON.stringify(products));
-            renderProducts();
-            renderAdminProducts();
-        }
-
-        // 4. 渲染前台收購清單 (搜尋功能也用這個)
+        // 渲染前台商品卡片
         function renderProducts(filterText = "") {
             const list = document.getElementById('productList');
             list.innerHTML = '';
-            let products = loadProducts();
-
+            
+            let displayProducts = globalProducts;
             if (filterText) {
-                products = products.filter(p => p.name.toLowerCase().includes(filterText.toLowerCase()));
+                displayProducts = displayProducts.filter(p => p.name.toLowerCase().includes(filterText.toLowerCase()));
             }
 
-            if (products.length === 0) {
+            if (displayProducts.length === 0) {
                 list.innerHTML = '<p style="text-align:center; padding: 20px;">找不到相關商品，請嘗試其他關鍵字，或直接加 LINE 詢問！</p>';
                 return;
             }
 
-            products.forEach(p => {
+            displayProducts.forEach(p => {
                 let html = `
                     <div class="product-item">
                         <div class="product-info">
-                            <h3>${p.name}</h3>
-                            <p>${p.desc}</p>
+                            <h3 style="font-size: 1.2em;">${p.name}</h3>
+                            <p style="margin-top:8px;">
+                                評估等級：<strong style="color:#e6683c; background:#fff0ed; padding:3px 8px; border-radius:4px;">${p.grade}</strong> | 
+                                報價更新日：${p.date}
+                            </p>
                         </div>
                         <div class="price-box">
-                            <div class="price-sell">商城售價: $${p.price}</div>
-                            <div class="price-buy">最高收購價: $${p.buyPrice}</div>
-                            <a href="https://line.me/R/ti/p/@kamen" target="_blank" class="line-btn">💬 傳照片給 LINE 客服估價</a>
+                            <div class="price-buy" style="font-size: 1.3em;">收購參考價: $${p.price}</div>
+                            <a href="https://line.me/R/ti/p/@kamen" target="_blank" class="line-btn">💬 傳照片給客服估價</a>
                         </div>
                     </div>
                 `;
@@ -358,13 +349,13 @@
             });
         }
 
-        // 5. 搜尋功能綁定
+        // 搜尋過濾
         function filterProducts() {
             const keyword = document.getElementById('searchInput').value;
             renderProducts(keyword);
         }
 
-        // 6. 進入後台的密碼檢查
+        // 管理員登入驗證
         function checkAdmin() {
             let pwd = prompt("請輸入管理員密碼");
             if (pwd === "0611") {
@@ -375,59 +366,25 @@
             }
         }
 
-        // 7. 渲染後台管理清單
+        // 渲染後台資料預覽
         function renderAdminProducts() {
             const list = document.getElementById('adminProductList');
             list.innerHTML = '';
-            let products = loadProducts();
-            
-            products.forEach(p => {
+            globalProducts.forEach(p => {
                 let html = `
-                    <div class="product-item">
+                    <div class="product-item" style="opacity: 0.8;">
                         <div>
                             <strong>${p.name}</strong><br>
-                            <small>售價: ${p.price} | 收購價: ${p.buyPrice}</small>
+                            <small>收購價: ${p.price} | 等級: ${p.grade} | 日期: ${p.date}</small>
                         </div>
-                        <button class="delete-btn" onclick="deleteProduct(${p.id})">刪除下架</button>
                     </div>
                 `;
                 list.innerHTML += html;
             });
         }
 
-        // 8. 後台新增商品
-        function addProduct() {
-            let name = document.getElementById('pName').value;
-            let desc = document.getElementById('pDesc').value;
-            let price = document.getElementById('pPrice').value;
-            let buyPrice = document.getElementById('pBuyPrice').value;
-
-            if(!name) return alert('商品名稱不能為空！');
-
-            let products = loadProducts();
-            let newId = products.length > 0 ? Math.max(...products.map(p => p.id)) + 1 : 1;
-            
-            products.push({ id: newId, name, desc, price: price || '未定', buyPrice: buyPrice || '需估價' });
-            saveProducts(products);
-            
-            document.getElementById('pName').value = '';
-            document.getElementById('pDesc').value = '';
-            document.getElementById('pPrice').value = '';
-            document.getElementById('pBuyPrice').value = '';
-            alert('上架成功！');
-        }
-
-        // 9. 後台刪除商品
-        function deleteProduct(id) {
-            if(confirm('確定要刪除這筆資料嗎？')) {
-                let products = loadProducts();
-                products = products.filter(p => p.id !== id);
-                saveProducts(products);
-            }
-        }
-
-        // 初始化
-        renderProducts();
+        // 網頁載入時，立刻去抓取 Google 表格資料
+        fetchGoogleSheetData();
     </script>
 </body>
 </html>
