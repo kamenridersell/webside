@@ -366,8 +366,8 @@
 
         // 6. 進入後台的密碼檢查
         function checkAdmin() {
-            let pwd = prompt("請輸入管理員密碼 (測試密碼為: 1234)");
-            if (pwd === "1234") {
+            let pwd = prompt("請輸入管理員密碼");
+            if (pwd === "0611") {
                 switchPage('admin');
                 renderAdminProducts();
             } else if (pwd !== null) {
