@@ -53,7 +53,6 @@
             transition: background 0.3s;
         }
         nav a:hover, nav a.active { background-color: #cc0010; color: #ffcc00; }
-        .admin-btn { background: #fff; color: #e60012; border: none; padding: 5px 10px; border-radius: 4px; font-weight: bold; cursor: pointer; }
         
         /* 頁面切換機制 */
         .page-view { display: none; }
@@ -137,9 +136,6 @@
         .price-buy { color: #009900; font-weight: bold; margin-top: 5px;}
         .line-btn { display: inline-block; background: #00c300; color: #fff; padding: 8px 15px; text-decoration: none; border-radius: 5px; margin-top: 10px; font-weight: bold; transition: opacity 0.3s;}
         .line-btn:hover { opacity: 0.9; }
-        
-        /* 後台管理區塊 */
-        .admin-panel { background: #fff3f3; padding: 20px; border-radius: 8px; border: 2px dashed #e60012; }
 
         @media (max-width: 768px) {
             header { flex-direction: column; text-align: center; gap: 15px; }
@@ -159,7 +155,6 @@
         <nav>
             <a onclick="switchPage('home')" id="nav-home" class="active">🏠 首頁</a>
             <a onclick="switchPage('buy')" id="nav-buy">💰 收購與報價</a>
-            <button class="admin-btn" onclick="checkAdmin()">管理員後台</button>
         </nav>
     </header>
 
@@ -253,25 +248,6 @@
         </div>
     </div>
 
-    <!-- ==================== 頁面 3：隱藏的管理員後台 ==================== -->
-    <div id="page-admin" class="page-view">
-        <div class="container admin-panel">
-            <h2 class="section-title">⚙️ 後台管理系統 (Google 表格連動)</h2>
-            <button onclick="switchPage('home')" style="margin-bottom: 20px; padding: 8px; background: #333; color:#fff; border:none; border-radius:4px;">🚪 登出並返回首頁</button>
-            
-            <h3>管理資料庫</h3>
-            <p>我們的資料庫已全面升級為 Google 雲端試算表。請點擊下方按鈕前往 Google 表格進行商品的新增、修改或刪除。</p>
-            <p style="color:#e60012; font-weight:bold;">(在表格修改完成後，前台網頁會即時同步最新資料)</p>
-            
-            <a href="https://docs.google.com/spreadsheets/u/0/" target="_blank" class="line-btn" style="background:#1e3c72; margin-bottom: 30px; font-size: 1.1em; display: inline-block;">📝 前往 Google 表格編輯資料</a>
-            
-            <h3>目前前台抓取到的最新資料 (預覽)</h3>
-            <div class="product-list" id="adminProductList">
-                <!-- 後台商品清單 -->
-            </div>
-        </div>
-    </div>
-
     <footer style="text-align: center; padding: 20px; background: #222; color: #aaa; margin-top: 40px;">
         <p>&copy; 2026 不髒媽工坊. All Rights Reserved. | LINE ID: @kamen</p>
     </footer>
@@ -295,7 +271,7 @@
 
             // GA4 虛擬頁面切換追蹤
             if (typeof gtag === 'function') {
-                let pageTitle = pageId === 'home' ? '首頁' : (pageId === 'buy' ? '收購報價頁' : '後台管理');
+                let pageTitle = pageId === 'home' ? '首頁' : '收購報價頁';
                 gtag('event', 'page_view', { page_title: pageTitle, page_location: window.location.href.split('?')[0] + '?page=' + pageId });
             }
         }
@@ -390,34 +366,6 @@
                         <div class="price-box">
                             <div class="price-buy" style="font-size: 1.3em;">收購參考價: $${p.price}</div>
                             <a href="https://line.me/R/ti/p/@kamen" target="_blank" class="line-btn">💬 傳照片給客服估價</a>
-                        </div>
-                    </div>
-                `;
-                list.innerHTML += html;
-            });
-        }
-
-        // 管理員登入驗證
-        function checkAdmin() {
-            let pwd = prompt("請輸入管理員密碼");
-            if (pwd === "0611") {
-                switchPage('admin');
-                renderAdminProducts();
-            } else if (pwd !== null) {
-                alert("密碼錯誤！");
-            }
-        }
-
-        // 渲染後台資料預覽
-        function renderAdminProducts() {
-            const list = document.getElementById('adminProductList');
-            list.innerHTML = '';
-            globalProducts.forEach(p => {
-                let html = `
-                    <div class="product-item" style="opacity: 0.8; flex-direction:row;">
-                        <div>
-                            <strong>[${p.series}] ${p.name}</strong><br>
-                            <small>收購價: ${p.price} | 等級: ${p.grade} | 日期: ${p.date}</small>
                         </div>
                     </div>
                 `;
