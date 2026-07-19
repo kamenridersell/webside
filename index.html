@@ -106,8 +106,13 @@
         .card-buy { background: linear-gradient(135deg, #111, #444); }
         .card-store { background: linear-gradient(135deg, #1e3c72, #2a5298); }
 
-        /* IG 與 店面區塊 */
-        .ig-section, .store-section { background: #fafafa; border-radius: 12px; padding: 30px; text-align: center; border: 1px solid #eee; margin-top: 30px;}
+        /* 影音與實體店面區塊 */
+        .ig-section, .youtube-section, .store-section { background: #fafafa; border-radius: 12px; padding: 30px; text-align: center; border: 1px solid #eee; margin-top: 30px;}
+        
+        /* YouTube 響應式容器 (確保手機上看比例也是完美的 16:9) */
+        .yt-container { position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; max-width: 100%; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); margin-top: 20px;}
+        .yt-container iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; }
+
         .ig-btn { display: inline-block; background: linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%); color: white; padding: 12px 24px; border-radius: 30px; text-decoration: none; font-weight: bold; margin-top: 15px; transition: opacity 0.3s;}
         .ig-btn:hover { opacity: 0.9; }
         .map-btn { display: inline-block; background: #333; color: white; padding: 12px 24px; border-radius: 30px; text-decoration: none; font-weight: bold; margin-top: 15px; transition: background 0.3s; }
@@ -205,6 +210,16 @@
                 <a href="https://www.instagram.com/kamenridersell/reels/" target="_blank" class="ig-btn">
                     追蹤 IG 看更多 @kamenridersell
                 </a>
+            </div>
+
+            <!-- YouTube 影片展示區塊 (新增) -->
+            <div class="youtube-section">
+                <h2 class="section-title" style="border:none;">📺 裝備開箱與評測</h2>
+                <p>不知道該不該入手？點擊播放我們的精選開箱影片，看看這條騎士腰帶有哪些超讚的隱藏聲光音效！</p>
+                
+                <div class="yt-container">
+                    <iframe src="https://www.youtube.com/embed/iNhZwJdoymg?si=A4gByIRUjPmEGtNi" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+                </div>
             </div>
 
             <!-- 實體店面資訊區塊 -->
