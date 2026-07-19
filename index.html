@@ -117,6 +117,8 @@
         .ig-btn:hover { opacity: 0.9; }
         .map-btn { display: inline-block; background: #333; color: white; padding: 12px 24px; border-radius: 30px; text-decoration: none; font-weight: bold; margin-top: 15px; transition: background 0.3s; }
         .map-btn:hover { background: #555; }
+        .repair-contact-btn { display: inline-block; background: #00c300; color: white; padding: 12px 28px; border-radius: 30px; text-decoration: none; font-weight: bold; font-size: 1.1em; margin-top: 20px; transition: opacity 0.3s; box-shadow: 0 4px 10px rgba(0,195,0,0.3);}
+        .repair-contact-btn:hover { opacity: 0.9; }
 
         /* 搜尋與分類區塊 */
         .search-box { display: flex; gap: 10px; margin-bottom: 15px; }
@@ -193,11 +195,11 @@
 
             <!-- IG 影音區塊 -->
             <div class="ig-section">
-                <h2 class="section-title" style="border:none;">🎬 近期熱門商品 </h2>
-                <p>想看更多假面騎士腰帶開箱實況嗎？<br>立刻點擊我們的 Instagram 觀看更多短影音！</p>
+                <h2 class="section-title" style="border:none;">🎬 最新 IG Reels 影音與開箱</h2>
+                <p>這支是我們精選的展示影片！想看更多假面騎士腰帶開箱實況嗎？<br>立刻點擊播放，或前往我們的 Instagram 觀看更多短影音！</p>
                 
                 <div style="display: flex; justify-content: center; margin: 20px 0;">
-                    <iframe src="https://www.instagram.com/reel/Da7ESLtyHnZ/embed" 
+                    <iframe src="https://www.instagram.com/reel/DZFrYICymyg/embed" 
                             width="400" 
                             height="480" 
                             frameborder="0" 
@@ -212,14 +214,29 @@
                 </a>
             </div>
 
-            <!-- YouTube 影片展示區塊 (新增) -->
+            <!-- YouTube 影片展示區塊 -->
             <div class="youtube-section">
                 <h2 class="section-title" style="border:none;">📺 老闆帶你走一次</h2>
-                <p>隱藏在2樓的神秘小店-從火車站出發囉!</p>
+                <p>隱藏在2樓的神秘小店-從高雄火車站出發囉!</p>
                 
                 <div class="yt-container">
                     <iframe src="https://www.youtube.com/embed/iNhZwJdoymg?si=A4gByIRUjPmEGtNi" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
                 </div>
+            </div>
+
+            <!-- 🔧 新增：YouTube 簡易維修服務區塊 -->
+            <div class="youtube-section">
+                <h2 class="section-title" style="border:none;">🔧 簡易維修服務</h2>
+                <p style="font-size: 1.1em; color: #333;"><strong>斷線、喇叭破音、觸點更換，請洽客服</strong></p>
+                
+                <div class="yt-container">
+                    <!-- 註解：目前的 src 網址暫用開箱影片墊檔。等您有真實的維修過程紀錄影片上傳 YouTube 後，請更換這行 src 的網址 -->
+                    <iframe src="https://youtube.com/embed/cZSRdrTqYCY?si=cxjOAR25FLLqIyMp" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+                </div>
+
+                <a href="https://line.me/R/ti/p/@kamen" target="_blank" class="repair-contact-btn">
+                    💬 點此加 LINE 洽詢維修報價
+                </a>
             </div>
 
             <!-- 實體店面資訊區塊 -->
